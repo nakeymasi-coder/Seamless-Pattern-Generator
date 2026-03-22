@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glam Seamless Pattern Prompt Generator</title>
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#141c35;
+      --panel:#11192d;
+      --panel2:#18233f;
+      --line:rgba(255,255,255,.12);
+      --text:#f5f7ff;
+      --muted:#bac4e0;
+      --accent:#f59e0b;
+      --accent2:#4f46e5;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:
+      radial-gradient(circle at top left, rgba(79,70,229,.25), transparent 28%),
+      radial-gradient(circle at top right, rgba(245,158,11,.18), transparent 25%),
+      linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      min-height:100%;
+    }
+
+    .wrap{
+      max-width:1500px;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, rgba(79,70,229,.28), rgba(245,158,11,.18));
+      border:1px solid var(--line);
+      border-radius:32px;
+      padding:28px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:auto -120px -120px auto;
+      width:260px;height:260px;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 65%);
+      filter:blur(8px);
+      pointer-events:none;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(2rem,4vw,3rem);
+      line-height:1.05;
+      letter-spacing:-.03em;
+    }
+
+    .sub{
+      margin:0;
+      max-width:980px;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.6;
+    }
+
+    .top-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    button, .file-label{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      font-size:.95rem;
+    }
+
+    button:hover,.file-label:hover{transform:translateY(-1px)}
+    button:active,.file-label:active{transform:translateY(0)}
+
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),#ffd08a);
+      color:#1b1405;
+    }
+
+    .btn-secondary{
+      background:linear-gradient(135deg,var(--accent2),#786fff);
+      color:white;
+    }
+
+    .btn-dark{
+      background:#0c1327;
+      color:white;
+      border:1px solid var(--line);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+    }
+
+    .panel h2{
+      margin:0 0 8px;
+      font-size:1.2rem;
+      letter-spacing:-.02em;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:.92rem;
+      margin:0 0 16px;
+      line-height:1.5;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:12px;
+    }
+
+    .field label{
+      font-size:.83rem;
+      color:#e8ecff;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    select, textarea, input[type="text"]{
+      width:100%;
+      background:#091122;
+      color:white;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:11px 12px;
+      outline:none;
+      font-size:.94rem;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    .full{grid-column:1/-1}
+
+    .preset-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .preset-btn{
+      text-align:left;
+      background:#0c1327;
+      border:1px solid var(--line);
+      color:white;
+      border-radius:14px;
+      padding:12px;
+      line-height:1.35;
+    }
+
+    .preset-btn small{
+      display:block;
+      color:var(--muted);
+      font-weight:500;
+      margin-top:4px;
+    }
+
+    .output-box{
+      background:#08101f;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:14px;
+      min-height:220px;
+      white-space:pre-wrap;
+      line-height:1.6;
+      color:#f7f8fd;
+      overflow:auto;
+    }
+
+    .stack{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .mini{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-top:6px;
+      line-height:1.45;
+    }
+
+    .badge-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .badge{
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      color:#d9e3ff;
+      font-size:.78rem;
+    }
+
+    .footer-note{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.87rem;
+      line-height:1.5;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    @media (max-width:1200px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:900px){
+      .form-grid{grid-template-columns:1fr 1fr}
+      .preset-grid{grid-template-columns:1fr 1fr}
+      .two{grid-template-columns:1fr}
+    }
+
+    @media (max-width:620px){
+      .form-grid{grid-template-columns:1fr}
+      .preset-grid{grid-template-columns:1fr}
+      .wrap{padding:14px}
+      .hero{padding:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Glam Seamless Pattern Prompt Generator</h1>
+      <p class="sub">
+        Build seamless pattern prompts for POD, wallpaper, fabric, wrapping paper, digital paper, stationery, and more.
+        This generator creates both a <strong>photo prompt</strong> and a <strong>video script prompt</strong>. It also supports
+        optional character-based pattern styling for glam faces, poses, and fashion-heavy motifs when you want more personality in the design.
+      </p>
+      <div class="top-actions">
+        <button class="btn-primary" id="generateTop">Generate Prompts</button>
+        <button class="btn-secondary" id="randomizeTop">Randomize</button>
+        <button class="btn-dark" id="clearTop">Clear All</button>
+      </div>
+      <div class="badge-row">
+        <div class="badge">30 options per dropdown</div>
+        <div class="badge">15 presets</div>
+        <div class="badge">Photo + video prompts</div>
+        <div class="badge">Camera controls</div>
+        <div class="badge">Lighting + shadow controls</div>
+        <div class="badge">Randomizer + copy</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Generator Controls</h2>
+        <p class="hint">Pick what you want. Leave anything on <strong>None</strong> if you don’t need it. For character-based patterns, use the face, pose, and styling controls. For regular repeat patterns, skip them.</p>
+
+        <div class="form-grid" id="formGrid">
+          <div class="field"><label for="patternTheme">Pattern Theme</label><select id="patternTheme"></select></div>
+          <div class="field"><label for="mainMotif">Main Motif</label><select id="mainMotif"></select></div>
+          <div class="field"><label for="secondaryFillers">Secondary Fillers</label><select id="secondaryFillers"></select></div>
+
+          <div class="field"><label for="artStyle">Art Style</label><select id="artStyle"></select></div>
+          <div class="field"><label for="colorPalette">Color Palette</label><select id="colorPalette"></select></div>
+          <div class="field"><label for="background">Background</label><select id="background"></select></div>
+
+          <div class="field"><label for="layout">Layout</label><select id="layout"></select></div>
+          <div class="field"><label for="repeatType">Repeat Type</label><select id="repeatType"></select></div>
+          <div class="field"><label for="scale">Scale</label><select id="scale"></select></div>
+
+          <div class="field"><label for="density">Density</label><select id="density"></select></div>
+          <div class="field"><label for="detailLevel">Detail Level</label><select id="detailLevel"></select></div>
+          <div class="field"><label for="mood">Mood</label><select id="mood"></select></div>
+
+          <div class="field"><label for="productUse">Product Use</label><select id="productUse"></select></div>
+          <div class="field"><label for="extraPromptEnhancers">Extra Prompt Enhancers</label><select id="extraPromptEnhancers"></select></div>
+          <div class="field"><label for="surfaceFinish">Surface Finish</label><select id="surfaceFinish"></select></div>
+
+          <div class="field"><label for="cameraAngle">Camera Angle</label><select id="cameraAngle"></select></div>
+          <div class="field"><label for="cameraShot">Camera Shot</label><select id="cameraShot"></select></div>
+          <div class="field"><label for="lensStyle">Lens Style</label><select id="lensStyle"></select></div>
+
+          <div class="field"><label for="lightingStyle">Lighting Style</label><select id="lightingStyle"></select></div>
+          <div class="field"><label for="shadowStyle">Shadow Style</label><select id="shadowStyle"></select></div>
+          <div class="field"><label for="renderOutput">Render Output</label><select id="renderOutput"></select></div>
+
+          <div class="field"><label for="faceType">Face Type (Optional)</label><select id="faceType"></select></div>
+          <div class="field"><label for="poseStyle">Pose Style (Optional)</label><select id="poseStyle"></select></div>
+          <div class="field"><label for="stylingDirection">Styling Direction (Optional)</label><select id="stylingDirection"></select></div>
+
+          <div class="field full">
+            <label for="customNotes">Custom Notes</label>
+            <textarea id="customNotes" placeholder="Add anything extra here. Example: keep it commercial and print-ready, avoid muddy colors, make the repeat extra clean, emphasize POD-friendly readability, add glam doll faces as tiny motifs, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="toolbar" style="margin-top:16px;">
+          <button class="btn-primary" id="generateBtn">Generate Prompts</button>
+          <button class="btn-secondary" id="randomizeBtn">Randomize</button>
+          <button class="btn-dark" id="clearBtn">Clear All</button>
+          <button class="btn-dark" id="copyPhotoBtn">Copy Photo Prompt</button>
+          <button class="btn-dark" id="copyVideoBtn">Copy Video Prompt</button>
+          <button class="btn-dark" id="copyBothBtn">Copy Both</button>
+        </div>
+
+        <p class="mini">
+          Tip: camera, lens, light, and shadow controls are especially useful when you want the AI to generate a
+          <strong>pattern presentation image</strong>, <strong>mockup-style concept render</strong>, or
+          <strong>cinematic pattern animation</strong>, not just a flat print tile.
+        </p>
+      </section>
+
+      <section class="stack">
+        <section class="panel">
+          <h2>15 Presets</h2>
+          <p class="hint">Tap one. It fills the controls fast so you’re not out here clicking a thousand things like a maniac.</p>
+          <div class="preset-grid" id="presetGrid"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Photo Prompt</h2>
+          <div class="output-box" id="photoOutput"></div>
+          <div class="footer-note">This is your still image prompt for seamless pattern creation or pattern presentation renders.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Video Script Prompt</h2>
+          <div class="output-box" id="videoOutput"></div>
+          <div class="footer-note">This is your cinematic AI video script prompt for pattern reveal clips, looping motion, or aesthetic POD showcases.</div>
+        </section>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const fields = {
+      patternTheme: [
+        "None",
+        "abstract",
+        "animal print",
+        "art deco",
+        "autumn",
+        "beach",
+        "boho",
+        "botanical",
+        "celestial",
+        "checkerboard",
+        "christmas",
+        "cottagecore",
+        "cute kids",
+        "dark academia",
+        "dessert",
+        "farmhouse",
+        "floral",
+        "food",
+        "gothic",
+        "holiday",
+        "kawaii",
+        "luxury glam",
+        "minimal modern",
+        "nautical",
+        "retro",
+        "romantic",
+        "spooky halloween",
+        "spring garden",
+        "summer tropical",
+        "valentine",
+        "vintage"
+      ],
+      mainMotif: [
+        "None",
+        "apples",
+        "bees",
+        "books",
+        "bows",
+        "butterflies",
+        "candles",
+        "cats",
+        "cherries",
+        "clouds",
+        "coffee cups",
+        "crowns",
+        "diamonds",
+        "flowers",
+        "handbags",
+        "hearts",
+        "lipsticks",
+        "moons",
+        "mushrooms",
+        "oranges",
+        "pearls",
+        "pumpkins",
+        "ribbons",
+        "roses",
+        "seashells",
+        "skulls",
+        "snowflakes",
+        "stars",
+        "strawberries",
+        "suns",
+        "tea cups"
+      ],
+      secondaryFillers: [
+        "None",
+        "arrows",
+        "berries",
+        "bubbles",
+        "butterfly dust",
+        "confetti",
+        "crescent moons",
+        "daisies",
+        "diamond sparkles",
+        "dots",
+        "feathers",
+        "gem stars",
+        "glitter dust",
+        "grid lines",
+        "hearts",
+        "lace details",
+        "leaves",
+        "mini bows",
+        "mini florals",
+        "pearls",
+        "petals",
+        "polka dots",
+        "ribbons",
+        "sparkles",
+        "starbursts",
+        "swirls",
+        "tiny gems",
+        "vines",
+        "waves",
+        "xoxo lettering",
+        "zigzags"
+      ],
+      artStyle: [
+        "None",
+        "3d glossy",
+        "airbrush",
+        "art nouveau",
+        "charcoal sketch",
+        "clean vector",
+        "collage",
+        "comic pop",
+        "digital painting",
+        "editorial luxury",
+        "flat graphic",
+        "folk art",
+        "gouache",
+        "hand-drawn",
+        "high realism",
+        "ink illustration",
+        "kawaii cartoon",
+        "line art",
+        "marker sketch",
+        "maximalist print",
+        "minimal",
+        "mixed media",
+        "paper cut",
+        "pastel illustration",
+        "pencil sketch",
+        "retro print",
+        "sticker style",
+        "surreal glam",
+        "vintage textile",
+        "watercolor",
+        "woodblock print"
+      ],
+      colorPalette: [
+        "None",
+        "autumn earth tones",
+        "beachy blues and sand",
+        "black and gold",
+        "black and white",
+        "blush pink and cream",
+        "bold rainbow",
+        "burnt orange and rust",
+        "candy brights",
+        "champagne and ivory",
+        "chocolate and caramel",
+        "cool gray neutrals",
+        "coral and teal",
+        "dusty rose and sage",
+        "emerald and gold",
+        "high-contrast primary colors",
+        "hot pink and orange",
+        "jewel tones",
+        "lavender and mint",
+        "lemon and sky blue",
+        "lilac and silver",
+        "mocha neutrals",
+        "monochrome blue",
+        "muted vintage",
+        "neon electric",
+        "pastel rainbow",
+        "peach and cream",
+        "rich berry tones",
+        "royal blue and gold",
+        "soft feminine pinks",
+        "terracotta and clay"
+      ],
+      background: [
+        "None",
+        "aged paper texture",
+        "airy cream backdrop",
+        "beige linen texture",
+        "black velvet backdrop",
+        "blush gradient",
+        "buttery yellow wash",
+        "charcoal textured paper",
+        "clean white backdrop",
+        "cloudy watercolor wash",
+        "coastal sand texture",
+        "deep navy backdrop",
+        "dusty rose backdrop",
+        "emerald gradient",
+        "glitter shimmer field",
+        "gold foil texture",
+        "gray stone texture",
+        "lavender mist backdrop",
+        "light peach backdrop",
+        "mint paper texture",
+        "mocha matte backdrop",
+        "off-white canvas texture",
+        "pastel ombre backdrop",
+        "pearlescent glow background",
+        "soft pink paper texture",
+        "subtle checker fade",
+        "taupe parchment background",
+        "transparent style backdrop",
+        "warm ivory backdrop",
+        "white linen texture",
+        "woodgrain texture"
+      ],
+      layout: [
+        "None",
+        "all-over repeat",
+        "balanced repeat",
+        "border style repeat",
+        "brick layout",
+        "centered medallion repeat",
+        "checkerboard layout",
+        "clustered composition",
+        "dense packed layout",
+        "diagonal flow",
+        "floating scattered layout",
+        "grid layout",
+        "half-drop arrangement",
+        "hero motif with fillers",
+        "horizontal stripe layout",
+        "layered overlap",
+        "loose tossed layout",
+        "mirrored arrangement",
+        "offset repeat layout",
+        "organic freeform",
+        "ornamental repeat",
+        "radial arrangement",
+        "random toss",
+        "ribbon trail layout",
+        "spaced motif layout",
+        "structured symmetry",
+        "tile block layout",
+        "tiny repeating icon layout",
+        "vertical stripe layout",
+        "wave flow layout",
+        "zigzag placement"
+      ],
+      repeatType: [
+        "None",
+        "all-over seamless",
+        "basic tile repeat",
+        "block repeat",
+        "brick repeat",
+        "clean edge seamless",
+        "continuous loop repeat",
+        "diamond repeat",
+        "drop repeat",
+        "engineered repeat",
+        "grid repeat",
+        "half-brick repeat",
+        "half-drop repeat",
+        "interlocking repeat",
+        "medallion repeat",
+        "micro repeat",
+        "mirrored repeat",
+        "offset repeat",
+        "one-way repeat",
+        "organic repeat",
+        "randomized seamless repeat",
+        "scatter repeat",
+        "seamless repeat",
+        "stripe repeat",
+        "surface tile repeat",
+        "tessellated repeat",
+        "textile repeat",
+        "tight tile repeat",
+        "tossed repeat",
+        "two-way repeat",
+        "wallpaper repeat"
+      ],
+      scale: [
+        "None",
+        "balanced mixed scale",
+        "bold large scale",
+        "extra large motifs",
+        "extra small print",
+        "giant statement scale",
+        "large motifs",
+        "large repeat spacing",
+        "medium large scale",
+        "medium motifs",
+        "medium small scale",
+        "micro scale",
+        "mini motifs",
+        "moderate scale",
+        "oversized icons",
+        "petite repeat",
+        "small delicate scale",
+        "small motifs",
+        "small repeat",
+        "tiny compact scale",
+        "tiny print",
+        "tiny repeat",
+        "varied icon scale",
+        "varied mixed scale",
+        "very large repeat",
+        "very small print",
+        "wide-scale motif spread",
+        "xl scale",
+        "xs scale",
+        "xxl scale",
+        "xxs scale"
+      ],
+      density: [
+        "None",
+        "airy open spacing",
+        "balanced density",
+        "breathing room between motifs",
+        "busy packed composition",
+        "clean moderate spacing",
+        "dense and detailed",
+        "dense but readable",
+        "dense layered fill",
+        "extra airy spacing",
+        "extra dense fill",
+        "heavy visual fill",
+        "light and open",
+        "light density",
+        "medium density",
+        "minimal spacing",
+        "moderate fullness",
+        "packed edge to edge",
+        "repeat-rich density",
+        "semi-dense layout",
+        "slightly airy",
+        "slightly busy",
+        "soft balanced spacing",
+        "sparse and elegant",
+        "tight composition",
+        "tightly clustered",
+        "visually rich fill",
+        "well-spaced",
+        "wide spacing",
+        "zero empty feel",
+        "zoomed-in fullness"
+      ],
+      detailLevel: [
+        "None",
+        "bold graphic detail",
+        "clean simple detail",
+        "commercial polish",
+        "crisp refined detail",
+        "delicate intricate detail",
+        "editorial-grade detail",
+        "extra fine detail",
+        "fine line detail",
+        "high detail",
+        "hyper-detailed",
+        "illustrative detail",
+        "intricate layered detail",
+        "light detail",
+        "luxury finish detail",
+        "medium detail",
+        "micro-detail accents",
+        "minimal detail",
+        "moderate detail",
+        "ornate detail",
+        "photoreal detail",
+        "print-clean detail",
+        "refined realistic detail",
+        "rich textured detail",
+        "sharp clean detail",
+        "simple flat detail",
+        "soft painterly detail",
+        "stylized detail",
+        "surface-design-ready detail",
+        "textile-friendly detail",
+        "ultra-detailed"
+      ],
+      mood: [
+        "None",
+        "airy",
+        "bold",
+        "cheerful",
+        "chic",
+        "coastal calm",
+        "coquette",
+        "cozy",
+        "cute",
+        "dark romantic",
+        "dreamy",
+        "edgy",
+        "elegant",
+        "feminine",
+        "fresh",
+        "fun",
+        "glamorous",
+        "joyful",
+        "luxe",
+        "magical",
+        "minimal",
+        "moody",
+        "nostalgic",
+        "playful",
+        "refined",
+        "retro",
+        "romantic",
+        "soft",
+        "sophisticated",
+        "whimsical",
+        "youthful"
+      ],
+      productUse: [
+        "None",
+        "apparel print",
+        "baby blanket",
+        "bedding",
+        "digital paper pack",
+        "fabric print",
+        "gift bag design",
+        "greeting card background",
+        "journaling paper",
+        "kitchen towel print",
+        "notebook cover",
+        "party supplies",
+        "phone case design",
+        "pillow cover",
+        "planner stickers",
+        "pod all-over print",
+        "pouch design",
+        "quilt fabric",
+        "scrapbook paper",
+        "shower curtain",
+        "socks print",
+        "stationery set",
+        "table runner",
+        "textile collection",
+        "tote bag print",
+        "tumbler wrap",
+        "wall art backdrop",
+        "wallpaper design",
+        "wrapping paper",
+        "yoga mat print",
+        "zip pouch print"
+      ],
+      extraPromptEnhancers: [
+        "None",
+        "balanced spacing",
+        "clean commercial finish",
+        "clean edges",
+        "clear motif hierarchy",
+        "cohesive repeat rhythm",
+        "crisp outlines",
+        "designer surface pattern feel",
+        "export-ready visual clarity",
+        "high-end textile design",
+        "loop-friendly motion",
+        "no muddy colors",
+        "no central focal point",
+        "pod-friendly composition",
+        "print-ready clarity",
+        "professional repeat engineering",
+        "refined motif balance",
+        "repeat-ready composition",
+        "seamless tiling precision",
+        "sharp printable contrast",
+        "surface pattern design quality",
+        "tileable design",
+        "ultra clean repeat seams",
+        "visual consistency",
+        "well-defined negative space",
+        "well-separated motifs",
+        "whitespace control",
+        "zero visible seam lines",
+        "zoom-clean detail",
+        "zoom-friendly resolution",
+        "production-ready polish"
+      ],
+      surfaceFinish: [
+        "None",
+        "brushed finish",
+        "canvas texture finish",
+        "clean flat finish",
+        "cotton print look",
+        "embossed effect",
+        "fabric weave finish",
+        "foil accent feel",
+        "glossy finish",
+        "grainy print finish",
+        "linen finish",
+        "matte finish",
+        "metallic shimmer finish",
+        "paper print finish",
+        "pearl sheen finish",
+        "photographic finish",
+        "polished finish",
+        "premium print finish",
+        "resin shine finish",
+        "satin finish",
+        "screenprint finish",
+        "silk sheen finish",
+        "soft touch finish",
+        "sparkle finish",
+        "sticker finish",
+        "suede-like finish",
+        "textile texture finish",
+        "velvet finish",
+        "vinyl finish",
+        "washed print finish",
+        "watercolor paper finish"
+      ],
+      cameraAngle: [
+        "None",
+        "aerial angle",
+        "bird's-eye view",
+        "close-up angle",
+        "diagonal top-down",
+        "direct front angle",
+        "dramatic low angle",
+        "editorial product angle",
+        "eye-level angle",
+        "flat lay angle",
+        "floating perspective angle",
+        "hero product angle",
+        "high-angle view",
+        "isometric angle",
+        "macro angle",
+        "museum display angle",
+        "oblique angle",
+        "overhead angle",
+        "pattern board angle",
+        "perspective tilt angle",
+        "print sample angle",
+        "quarter-turn angle",
+        "retail display angle",
+        "room scene angle",
+        "side angle",
+        "slightly elevated angle",
+        "straight-on angle",
+        "tabletop angle",
+        "top-down angle",
+        "wall display angle",
+        "wide establishing angle"
+      ],
+      cameraShot: [
+        "None",
+        "close crop shot",
+        "close-up shot",
+        "detail shot",
+        "editorial campaign shot",
+        "flat lay shot",
+        "full composition shot",
+        "full frame shot",
+        "full product shot",
+        "hero shot",
+        "lifestyle display shot",
+        "long shot",
+        "macro shot",
+        "medium close shot",
+        "medium shot",
+        "micro detail shot",
+        "mockup shot",
+        "pattern preview shot",
+        "print sample shot",
+        "product showcase shot",
+        "repeat tile shot",
+        "retail mockup shot",
+        "room mockup shot",
+        "sample board shot",
+        "surface close-up shot",
+        "swatch shot",
+        "textile sample shot",
+        "top-down flat lay shot",
+        "wide shot",
+        "window display shot",
+        "zoom detail shot"
+      ],
+      lensStyle: [
+        "None",
+        "24mm lens",
+        "28mm lens",
+        "35mm lens",
+        "50mm lens",
+        "70mm lens",
+        "85mm lens",
+        "90mm macro lens",
+        "100mm macro lens",
+        "120mm lens",
+        "cinematic lens",
+        "clean product lens",
+        "commercial print lens",
+        "documentary lens",
+        "editorial lens",
+        "fashion lens",
+        "fine art lens",
+        "flat perspective lens",
+        "macro lens",
+        "medium-format lens",
+        "museum display lens",
+        "natural perspective lens",
+        "overhead capture lens",
+        "product photography lens",
+        "retail display lens",
+        "sharp studio lens",
+        "soft editorial lens",
+        "swatch capture lens",
+        "tilt-shift lens",
+        "wide-angle lens",
+        "zoom lens"
+      ],
+      lightingStyle: [
+        "None",
+        "ambient glow lighting",
+        "backlit glow",
+        "bright clean daylight",
+        "cinematic moody lighting",
+        "diffused studio lighting",
+        "dramatic spotlight",
+        "editorial campaign lighting",
+        "even soft lighting",
+        "gallery lighting",
+        "gentle morning light",
+        "glam shine lighting",
+        "golden hour lighting",
+        "high-key lighting",
+        "indirect natural light",
+        "interior retail lighting",
+        "luxury storefront lighting",
+        "matte studio lighting",
+        "moody window light",
+        "museum-style lighting",
+        "natural daylight",
+        "neon accent lighting",
+        "overcast soft light",
+        "pearlescent light wash",
+        "print sample lighting",
+        "ring light glow",
+        "soft box lighting",
+        "soft luxury lighting",
+        "studio product lighting",
+        "sunlit bright lighting",
+        "warm commercial lighting"
+      ],
+      shadowStyle: [
+        "None",
+        "bold contrast shadows",
+        "clean cut shadows",
+        "crisp showroom shadows",
+        "deep luxe shadows",
+        "diffused soft shadows",
+        "dramatic directional shadows",
+        "editorial shadows",
+        "elegant ambient shadows",
+        "even shadow control",
+        "faint natural shadows",
+        "feathered shadows",
+        "floating shadows",
+        "gentle depth shadows",
+        "glossy highlight shadows",
+        "hard edge shadows",
+        "layered object shadows",
+        "light grounded shadows",
+        "minimal shadows",
+        "museum display shadows",
+        "natural soft shadows",
+        "no visible shadows",
+        "print-friendly shadow balance",
+        "retail display shadows",
+        "rich dimensional shadows",
+        "sharp directional shadows",
+        "soft gradient shadows",
+        "studio-controlled shadows",
+        "subtle contact shadows",
+        "textured shadow play",
+        "underlit dramatic shadows"
+      ],
+      renderOutput: [
+        "None",
+        "animated textile concept",
+        "cinematic pattern reveal",
+        "commercial mockup visual",
+        "digital paper preview",
+        "fabric swatch visualization",
+        "flat seamless tile",
+        "gift wrap concept preview",
+        "hero pod product visual",
+        "interior wallpaper scene",
+        "looping pattern animation",
+        "moodboard pattern showcase",
+        "packaging print concept",
+        "phone case mockup",
+        "pillow mockup concept",
+        "pod storefront visual",
+        "print sheet preview",
+        "product catalog visual",
+        "retail presentation scene",
+        "sample board presentation",
+        "seamless design tile",
+        "social media promo visual",
+        "stationery collection visual",
+        "surface design presentation",
+        "swatch card mockup",
+        "tabletop display scene",
+        "textile catalog spread",
+        "tote bag mockup",
+        "wall art concept",
+        "wallpaper room visual",
+        "wrapping paper mockup"
+      ],
+      faceType: [
+        "None",
+        "abstract illustrated faces",
+        "afro glam beauty faces",
+        "angelic doll faces",
+        "anime-inspired faces",
+        "art doll faces",
+        "beauty editorial faces",
+        "bold cartoon faces",
+        "bratz-inspired glam faces",
+        "celestial goddess faces",
+        "chibi doll faces",
+        "classic fashion sketch faces",
+        "coquette feminine faces",
+        "cute kawaii faces",
+        "dark romantic faces",
+        "diverse beauty faces",
+        "fantasy fairy faces",
+        "glam mascot faces",
+        "high-fashion model faces",
+        "luxury illustrated faces",
+        "minimal line-art faces",
+        "mod fashion faces",
+        "pin-up inspired faces",
+        "pop-art faces",
+        "pretty doll faces",
+        "retro beauty faces",
+        "soft feminine faces",
+        "stylized beauty portraits",
+        "surreal goddess faces",
+        "vintage cameo faces",
+        "y2k doll faces"
+      ],
+      poseStyle: [
+        "None",
+        "angled fashion stance",
+        "arms-up playful pose",
+        "beauty close-up pose",
+        "bent-knee fashion pose",
+        "blowing-a-kiss pose",
+        "confident hand-on-hip pose",
+        "delicate seated pose",
+        "editorial runway pose",
+        "floating fantasy pose",
+        "gentle side profile pose",
+        "glam selfie pose",
+        "hair flip pose",
+        "high-fashion lean pose",
+        "joyful jump pose",
+        "looking-over-shoulder pose",
+        "mini icon pose variety",
+        "model walk pose",
+        "open-arm welcoming pose",
+        "power stance pose",
+        "profile portrait pose",
+        "reaching pose",
+        "relaxed standing pose",
+        "romantic soft pose",
+        "running playful pose",
+        "seated glam pose",
+        "spinning twirl pose",
+        "stylized dance pose",
+        "tilted-head cute pose",
+        "tiny repeated pose mix",
+        "waving pose"
+      ],
+      stylingDirection: [
+        "None",
+        "art doll styling",
+        "beachy styling",
+        "black-tie styling",
+        "boho styling",
+        "casual cute styling",
+        "celestial styling",
+        "coquette styling",
+        "cottagecore styling",
+        "editorial glam styling",
+        "elegant luxury styling",
+        "fairycore styling",
+        "festival styling",
+        "formal gown styling",
+        "girly glam styling",
+        "gothic styling",
+        "holiday styling",
+        "kawaii styling",
+        "minimal chic styling",
+        "modest fashion styling",
+        "old hollywood styling",
+        "pin-up styling",
+        "playful pop styling",
+        "preppy styling",
+        "retro styling",
+        "romantic styling",
+        "streetwear styling",
+        "surreal fantasy styling",
+        "vintage styling",
+        "western styling",
+        "y2k styling"
+      ]
+    };
+
+    const presets = [
+      {
+        name: "Blush Bow Coquette",
+        note: "Sweet, feminine, cute POD pattern.",
+        values: {
+          patternTheme: "coquette",
+          mainMotif: "bows",
+          secondaryFillers: "hearts",
+          artStyle: "pastel illustration",
+          colorPalette: "blush pink and cream",
+          background: "soft pink paper texture",
+          layout: "loose tossed layout",
+          repeatType: "seamless repeat",
+          scale: "small delicate scale",
+          density: "balanced density",
+          detailLevel: "clean simple detail",
+          mood: "romantic",
+          productUse: "wrapping paper",
+          extraPromptEnhancers: "tileable design",
+          surfaceFinish: "paper print finish",
+          cameraAngle: "top-down angle",
+          cameraShot: "pattern preview shot",
+          lensStyle: "clean product lens",
+          lightingStyle: "soft luxury lighting",
+          shadowStyle: "subtle contact shadows",
+          renderOutput: "wrapping paper mockup",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep the repeat ultra clean and giftable, soft coquette energy, no muddy pinks."
+        }
+      },
+      {
+        name: "Luxury Black Gold",
+        note: "High-end glam repeat for premium POD.",
+        values: {
+          patternTheme: "luxury glam",
+          mainMotif: "crowns",
+          secondaryFillers: "diamond sparkles",
+          artStyle: "editorial luxury",
+          colorPalette: "black and gold",
+          background: "black velvet backdrop",
+          layout: "structured symmetry",
+          repeatType: "wallpaper repeat",
+          scale: "medium motifs",
+          density: "dense but readable",
+          detailLevel: "luxury finish detail",
+          mood: "luxe",
+          productUse: "wallpaper design",
+          extraPromptEnhancers: "high-end textile design",
+          surfaceFinish: "metallic shimmer finish",
+          cameraAngle: "direct front angle",
+          cameraShot: "hero shot",
+          lensStyle: "editorial lens",
+          lightingStyle: "luxury storefront lighting",
+          shadowStyle: "deep luxe shadows",
+          renderOutput: "wallpaper room visual",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Make it opulent, polished, and premium with crisp repeat engineering."
+        }
+      },
+      {
+        name: "Retro Cherry Pop",
+        note: "Playful throwback digital paper vibe.",
+        values: {
+          patternTheme: "retro",
+          mainMotif: "cherries",
+          secondaryFillers: "polka dots",
+          artStyle: "retro print",
+          colorPalette: "candy brights",
+          background: "warm ivory backdrop",
+          layout: "random toss",
+          repeatType: "tossed repeat",
+          scale: "small motifs",
+          density: "slightly busy",
+          detailLevel: "stylized detail",
+          mood: "playful",
+          productUse: "digital paper pack",
+          extraPromptEnhancers: "print-ready clarity",
+          surfaceFinish: "paper print finish",
+          cameraAngle: "flat lay angle",
+          cameraShot: "flat lay shot",
+          lensStyle: "50mm lens",
+          lightingStyle: "bright clean daylight",
+          shadowStyle: "light grounded shadows",
+          renderOutput: "digital paper preview",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep it punchy, clean, nostalgic, and easy to tile."
+        }
+      },
+      {
+        name: "Cottage Rose Garden",
+        note: "Soft floral pattern for fabric and paper.",
+        values: {
+          patternTheme: "cottagecore",
+          mainMotif: "roses",
+          secondaryFillers: "leaves",
+          artStyle: "watercolor",
+          colorPalette: "dusty rose and sage",
+          background: "aged paper texture",
+          layout: "organic freeform",
+          repeatType: "all-over seamless",
+          scale: "medium small scale",
+          density: "soft balanced spacing",
+          detailLevel: "delicate intricate detail",
+          mood: "cozy",
+          productUse: "fabric print",
+          extraPromptEnhancers: "refined motif balance",
+          surfaceFinish: "cotton print look",
+          cameraAngle: "overhead angle",
+          cameraShot: "swatch shot",
+          lensStyle: "natural perspective lens",
+          lightingStyle: "gentle morning light",
+          shadowStyle: "diffused soft shadows",
+          renderOutput: "fabric swatch visualization",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Make it charming, airy, and feminine with a soft vintage textile feel."
+        }
+      },
+      {
+        name: "Spooky Cute Halloween",
+        note: "Adorable spooky seller.",
+        values: {
+          patternTheme: "spooky halloween",
+          mainMotif: "skulls",
+          secondaryFillers: "stars",
+          artStyle: "kawaii cartoon",
+          colorPalette: "hot pink and orange",
+          background: "charcoal textured paper",
+          layout: "floating scattered layout",
+          repeatType: "seamless repeat",
+          scale: "small motifs",
+          density: "busy packed composition",
+          detailLevel: "clean simple detail",
+          mood: "cute",
+          productUse: "planner stickers",
+          extraPromptEnhancers: "pod-friendly composition",
+          surfaceFinish: "sticker finish",
+          cameraAngle: "flat lay angle",
+          cameraShot: "product showcase shot",
+          lensStyle: "35mm lens",
+          lightingStyle: "ambient glow lighting",
+          shadowStyle: "soft gradient shadows",
+          renderOutput: "social media promo visual",
+          faceType: "cute kawaii faces",
+          poseStyle: "tiny repeated pose mix",
+          stylingDirection: "kawaii styling",
+          customNotes: "Keep it spooky but cute, marketable, sticker-friendly, and not too dark."
+        }
+      },
+      {
+        name: "Royal Blue Glam",
+        note: "Branded glam pattern with boss energy.",
+        values: {
+          patternTheme: "luxury glam",
+          mainMotif: "diamonds",
+          secondaryFillers: "sparkles",
+          artStyle: "surreal glam",
+          colorPalette: "royal blue and gold",
+          background: "pearlescent glow background",
+          layout: "balanced repeat",
+          repeatType: "seamless repeat",
+          scale: "medium motifs",
+          density: "moderate fullness",
+          detailLevel: "editorial-grade detail",
+          mood: "glamorous",
+          productUse: "tote bag print",
+          extraPromptEnhancers: "clean commercial finish",
+          surfaceFinish: "glossy finish",
+          cameraAngle: "editorial product angle",
+          cameraShot: "hero shot",
+          lensStyle: "fashion lens",
+          lightingStyle: "glam shine lighting",
+          shadowStyle: "rich dimensional shadows",
+          renderOutput: "hero pod product visual",
+          faceType: "glam mascot faces",
+          poseStyle: "confident hand-on-hip pose",
+          stylingDirection: "editorial glam styling",
+          customNotes: "Add upscale glam energy, distinct beauty styling, and strong brand appeal."
+        }
+      },
+      {
+        name: "Coastal Shell Repeat",
+        note: "Peaceful beachy seller.",
+        values: {
+          patternTheme: "beach",
+          mainMotif: "seashells",
+          secondaryFillers: "waves",
+          artStyle: "clean vector",
+          colorPalette: "beachy blues and sand",
+          background: "coastal sand texture",
+          layout: "spaced motif layout",
+          repeatType: "surface tile repeat",
+          scale: "medium motifs",
+          density: "airy open spacing",
+          detailLevel: "crisp refined detail",
+          mood: "coastal calm",
+          productUse: "shower curtain",
+          extraPromptEnhancers: "well-defined negative space",
+          surfaceFinish: "satin finish",
+          cameraAngle: "room scene angle",
+          cameraShot: "room mockup shot",
+          lensStyle: "wide-angle lens",
+          lightingStyle: "natural daylight",
+          shadowStyle: "natural soft shadows",
+          renderOutput: "interior wallpaper scene",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep it serene, beachy, and airy with a clean luxury spa vibe."
+        }
+      },
+      {
+        name: "Kawaii Strawberry Jam",
+        note: "Cute and loud seller for gift stuff.",
+        values: {
+          patternTheme: "kawaii",
+          mainMotif: "strawberries",
+          secondaryFillers: "mini florals",
+          artStyle: "sticker style",
+          colorPalette: "pastel rainbow",
+          background: "light peach backdrop",
+          layout: "random toss",
+          repeatType: "scatter repeat",
+          scale: "small motifs",
+          density: "dense and detailed",
+          detailLevel: "stylized detail",
+          mood: "joyful",
+          productUse: "gift bag design",
+          extraPromptEnhancers: "zoom-friendly resolution",
+          surfaceFinish: "sticker finish",
+          cameraAngle: "tabletop angle",
+          cameraShot: "lifestyle display shot",
+          lensStyle: "50mm lens",
+          lightingStyle: "sunlit bright lighting",
+          shadowStyle: "faint natural shadows",
+          renderOutput: "gift wrap concept preview",
+          faceType: "chibi doll faces",
+          poseStyle: "tilted-head cute pose",
+          stylingDirection: "playful pop styling",
+          customNotes: "Add tiny glam expressions and candy-cute energy without cluttering the repeat."
+        }
+      },
+      {
+        name: "Dark Academia Books",
+        note: "Moody and smart without looking dead inside.",
+        values: {
+          patternTheme: "dark academia",
+          mainMotif: "books",
+          secondaryFillers: "candles",
+          artStyle: "ink illustration",
+          colorPalette: "mocha neutrals",
+          background: "taupe parchment background",
+          layout: "clustered composition",
+          repeatType: "offset repeat",
+          scale: "medium small scale",
+          density: "balanced density",
+          detailLevel: "fine line detail",
+          mood: "moody",
+          productUse: "notebook cover",
+          extraPromptEnhancers: "designer surface pattern feel",
+          surfaceFinish: "paper print finish",
+          cameraAngle: "slightly elevated angle",
+          cameraShot: "editorial campaign shot",
+          lensStyle: "documentary lens",
+          lightingStyle: "moody window light",
+          shadowStyle: "editorial shadows",
+          renderOutput: "product catalog visual",
+          faceType: "minimal line-art faces",
+          poseStyle: "profile portrait pose",
+          stylingDirection: "vintage styling",
+          customNotes: "Make it smart, sophisticated, literary, and collector-worthy."
+        }
+      },
+      {
+        name: "Valentine Pearl Hearts",
+        note: "Pretty giftable romance print.",
+        values: {
+          patternTheme: "valentine",
+          mainMotif: "hearts",
+          secondaryFillers: "pearls",
+          artStyle: "digital painting",
+          colorPalette: "peach and cream",
+          background: "blush gradient",
+          layout: "balanced repeat",
+          repeatType: "all-over seamless",
+          scale: "small delicate scale",
+          density: "well-spaced",
+          detailLevel: "medium detail",
+          mood: "soft",
+          productUse: "greeting card background",
+          extraPromptEnhancers: "visual consistency",
+          surfaceFinish: "pearl sheen finish",
+          cameraAngle: "direct front angle",
+          cameraShot: "full composition shot",
+          lensStyle: "soft editorial lens",
+          lightingStyle: "soft luxury lighting",
+          shadowStyle: "gentle depth shadows",
+          renderOutput: "stationery collection visual",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep it romantic, polished, and gentle with a feminine upscale finish."
+        }
+      },
+      {
+        name: "Holiday Snow Sparkle",
+        note: "Winter seller for wrapping and paper goods.",
+        values: {
+          patternTheme: "christmas",
+          mainMotif: "snowflakes",
+          secondaryFillers: "glitter dust",
+          artStyle: "clean vector",
+          colorPalette: "monochrome blue",
+          background: "deep navy backdrop",
+          layout: "structured symmetry",
+          repeatType: "basic tile repeat",
+          scale: "medium motifs",
+          density: "medium density",
+          detailLevel: "sharp clean detail",
+          mood: "fresh",
+          productUse: "wrapping paper",
+          extraPromptEnhancers: "sharp printable contrast",
+          surfaceFinish: "sparkle finish",
+          cameraAngle: "top-down angle",
+          cameraShot: "mockup shot",
+          lensStyle: "product photography lens",
+          lightingStyle: "backlit glow",
+          shadowStyle: "studio-controlled shadows",
+          renderOutput: "wrapping paper mockup",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Make it clean, wintery, elegant, and gift-shop ready."
+        }
+      },
+      {
+        name: "Bee Garden Farmhouse",
+        note: "Sweet rustic repeat for home goods.",
+        values: {
+          patternTheme: "farmhouse",
+          mainMotif: "bees",
+          secondaryFillers: "daisies",
+          artStyle: "folk art",
+          colorPalette: "lemon and sky blue",
+          background: "off-white canvas texture",
+          layout: "organic freeform",
+          repeatType: "tossed repeat",
+          scale: "medium small scale",
+          density: "slightly airy",
+          detailLevel: "illustrative detail",
+          mood: "cheerful",
+          productUse: "kitchen towel print",
+          extraPromptEnhancers: "clear motif hierarchy",
+          surfaceFinish: "linen finish",
+          cameraAngle: "tabletop angle",
+          cameraShot: "product showcase shot",
+          lensStyle: "35mm lens",
+          lightingStyle: "warm commercial lighting",
+          shadowStyle: "subtle contact shadows",
+          renderOutput: "tabletop display scene",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep it rustic but bright, simple, and handmade-feeling."
+        }
+      },
+      {
+        name: "Mod Fashion Faces",
+        note: "Character-based fashion repeat with style.",
+        values: {
+          patternTheme: "minimal modern",
+          mainMotif: "ribbons",
+          secondaryFillers: "grid lines",
+          artStyle: "editorial luxury",
+          colorPalette: "cool gray neutrals",
+          background: "clean white backdrop",
+          layout: "grid layout",
+          repeatType: "engineered repeat",
+          scale: "balanced mixed scale",
+          density: "clean moderate spacing",
+          detailLevel: "editorial-grade detail",
+          mood: "chic",
+          productUse: "phone case design",
+          extraPromptEnhancers: "professional repeat engineering",
+          surfaceFinish: "premium print finish",
+          cameraAngle: "straight-on angle",
+          cameraShot: "editorial campaign shot",
+          lensStyle: "85mm lens",
+          lightingStyle: "high-key lighting",
+          shadowStyle: "clean cut shadows",
+          renderOutput: "phone case mockup",
+          faceType: "high-fashion model faces",
+          poseStyle: "editorial runway pose",
+          stylingDirection: "minimal chic styling",
+          customNotes: "Each face, pose, and styling should vary slightly while keeping the same overall fashion aesthetic."
+        }
+      },
+      {
+        name: "Celestial Moon Magic",
+        note: "Dreamy moon-and-stars seller.",
+        values: {
+          patternTheme: "celestial",
+          mainMotif: "moons",
+          secondaryFillers: "starbursts",
+          artStyle: "mixed media",
+          colorPalette: "lilac and silver",
+          background: "lavender mist backdrop",
+          layout: "radial arrangement",
+          repeatType: "mirrored repeat",
+          scale: "moderate scale",
+          density: "moderate fullness",
+          detailLevel: "rich textured detail",
+          mood: "magical",
+          productUse: "bedding",
+          extraPromptEnhancers: "cohesive repeat rhythm",
+          surfaceFinish: "silk sheen finish",
+          cameraAngle: "floating perspective angle",
+          cameraShot: "full frame shot",
+          lensStyle: "fine art lens",
+          lightingStyle: "pearlescent light wash",
+          shadowStyle: "feathered shadows",
+          renderOutput: "moodboard pattern showcase",
+          faceType: "celestial goddess faces",
+          poseStyle: "floating fantasy pose",
+          stylingDirection: "celestial styling",
+          customNotes: "Soft magic, subtle shimmer, polished mystic energy, seamless and elegant."
+        }
+      },
+      {
+        name: "Tropical Summer Pop",
+        note: "Vacation-ready bold seller.",
+        values: {
+          patternTheme: "summer tropical",
+          mainMotif: "oranges",
+          secondaryFillers: "waves",
+          artStyle: "flat graphic",
+          colorPalette: "coral and teal",
+          background: "mint paper texture",
+          layout: "diagonal flow",
+          repeatType: "drop repeat",
+          scale: "large motifs",
+          density: "balanced density",
+          detailLevel: "bold graphic detail",
+          mood: "fun",
+          productUse: "tumbler wrap",
+          extraPromptEnhancers: "production-ready polish",
+          surfaceFinish: "glossy finish",
+          cameraAngle: "hero product angle",
+          cameraShot: "product showcase shot",
+          lensStyle: "commercial print lens",
+          lightingStyle: "bright clean daylight",
+          shadowStyle: "sharp directional shadows",
+          renderOutput: "tumbler mockup",
+          faceType: "None",
+          poseStyle: "None",
+          stylingDirection: "None",
+          customNotes: "Keep it loud, juicy, summery, and very clean for sublimation products."
+        }
+      }
+    ];
+
+    const ids = Object.keys(fields);
+    const selects = {};
+
+    function fillSelect(id, options){
+      const select = document.getElementById(id);
+      selects[id] = select;
+      select.innerHTML = "";
+      options.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt;
+        o.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+        select.appendChild(o);
+      });
+    }
+
+    ids.forEach(id => fillSelect(id, fields[id]));
+
+    function getFormValues(){
+      const out = {};
+      ids.forEach(id => out[id] = selects[id].value);
+      out.customNotes = document.getElementById("customNotes").value.trim();
+      return out;
+    }
+
+    function setFormValues(values){
+      ids.forEach(id => {
+        if(values[id] && fields[id].includes(values[id])){
+          selects[id].value = values[id];
+        } else {
+          selects[id].value = "None";
+        }
+      });
+      document.getElementById("customNotes").value = values.customNotes || "";
+      generatePrompts();
+    }
+
+    function clearAll(){
+      ids.forEach(id => selects[id].value = "None");
+      document.getElementById("customNotes").value = "";
+      generatePrompts();
+    }
+
+    function randomChoice(arr){
+      const clean = arr.slice(1);
+      return clean[Math.floor(Math.random() * clean.length)];
+    }
+
+    function randomizeAll(){
+      ids.forEach(id => {
+        selects[id].value = randomChoice(fields[id]);
+      });
+      if (Math.random() > 0.45){
+        document.getElementById("customNotes").value = randomCustomNote();
+      } else {
+        document.getElementById("customNotes").value = "";
+      }
+      generatePrompts();
+    }
+
+    function randomCustomNote(){
+      const notes = [
+        "Keep the repeat extremely clean and commercial with no visible seam lines.",
+        "Make it feel premium and POD-friendly with sharp motif readability.",
+        "Emphasize a polished seamless tile that works on fabric and wrapping paper.",
+        "Keep the colors rich but not muddy, with strong contrast and clear edges.",
+        "Add a subtle glam tone while staying print-ready and giftable.",
+        "Make the arrangement feel balanced, upscale, and easy to upscale into a collection.",
+        "For character motifs, vary the faces, poses, and styling while preserving the same overall aesthetic.",
+        "Keep it cute, trendy, and social-media-friendly without looking cluttered.",
+        "Make the background support the motif instead of overpowering it.",
+        "Prioritize surface design quality, repeat logic, and premium mockup appeal."
+      ];
+      return notes[Math.floor(Math.random() * notes.length)];
+    }
+
+    function humanize(value){
+      if(!value || value === "None") return "";
+      return value;
+    }
+
+    function joinParts(parts){
+      return parts.filter(Boolean).join(", ");
+    }
+
+    function sentenceParts(parts){
+      return parts.filter(Boolean).join(". ");
+    }
+
+    function buildBackgroundSuggestion(values){
+      if (values.background !== "None") return values.background;
+
+      const map = {
+        "beach":"coastal sand texture",
+        "boho":"beige linen texture",
+        "botanical":"off-white canvas texture",
+        "celestial":"lavender mist backdrop",
+        "christmas":"deep navy backdrop",
+        "cottagecore":"aged paper texture",
+        "cute kids":"clean white backdrop",
+        "dark academia":"taupe parchment background",
+        "dessert":"light peach backdrop",
+        "farmhouse":"white linen texture",
+        "floral":"airy cream backdrop",
+        "food":"warm ivory backdrop",
+        "gothic":"black velvet backdrop",
+        "holiday":"blush gradient",
+        "kawaii":"pastel ombre backdrop",
+        "luxury glam":"pearlescent glow background",
+        "minimal modern":"clean white backdrop",
+        "nautical":"coastal sand texture",
+        "retro":"warm ivory backdrop",
+        "romantic":"blush gradient",
+        "spooky halloween":"charcoal textured paper",
+        "spring garden":"mint paper texture",
+        "summer tropical":"buttery yellow wash",
+        "valentine":"soft pink paper texture",
+        "vintage":"aged paper texture"
+      };
+
+      return map[values.patternTheme] || "clean white backdrop";
+    }
+
+    function buildPhotoPrompt(values){
+      const suggestedBg = buildBackgroundSuggestion(values);
+      const characterInstruction = values.faceType !== "None" || values.poseStyle !== "None" || values.stylingDirection !== "None"
+        ? "If character motifs are included, each repeated character should feature a uniquely distinct face, pose, and styling while maintaining the same overall aesthetic, motif language, and brand consistency"
+        : "";
+
+      const prompt = [
+        "Create a seamless repeating surface pattern for POD and print design",
+        joinParts([
+          humanize(values.patternTheme) ? `pattern theme: ${humanize(values.patternTheme)}` : "",
+          humanize(values.mainMotif) ? `main motif: ${humanize(values.mainMotif)}` : "",
+          humanize(values.secondaryFillers) ? `secondary fillers: ${humanize(values.secondaryFillers)}` : "",
+          humanize(values.artStyle) ? `art style: ${humanize(values.artStyle)}` : "",
+          humanize(values.colorPalette) ? `color palette: ${humanize(values.colorPalette)}` : "",
+          `background: ${suggestedBg}`,
+          humanize(values.layout) ? `layout: ${humanize(values.layout)}` : "",
+          humanize(values.repeatType) ? `repeat type: ${humanize(values.repeatType)}` : "",
+          humanize(values.scale) ? `scale: ${humanize(values.scale)}` : "",
+          humanize(values.density) ? `density: ${humanize(values.density)}` : "",
+          humanize(values.detailLevel) ? `detail level: ${humanize(values.detailLevel)}` : "",
+          humanize(values.mood) ? `mood: ${humanize(values.mood)}` : "",
+          humanize(values.productUse) ? `intended product use: ${humanize(values.productUse)}` : "",
+          humanize(values.surfaceFinish) ? `surface finish: ${humanize(values.surfaceFinish)}` : "",
+          humanize(values.extraPromptEnhancers) ? `enhancer: ${humanize(values.extraPromptEnhancers)}` : ""
+        ]),
+        characterInstruction,
+        joinParts([
+          humanize(values.faceType) ? `optional face motif style: ${humanize(values.faceType)}` : "",
+          humanize(values.poseStyle) ? `optional pose direction: ${humanize(values.poseStyle)}` : "",
+          humanize(values.stylingDirection) ? `optional styling direction: ${humanize(values.stylingDirection)}` : ""
+        ]),
+        joinParts([
+          humanize(values.cameraAngle) ? `camera angle: ${humanize(values.cameraAngle)}` : "",
+          humanize(values.cameraShot) ? `shot type: ${humanize(values.cameraShot)}` : "",
+          humanize(values.lensStyle) ? `lens: ${humanize(values.lensStyle)}` : "",
+          humanize(values.lightingStyle) ? `lighting: ${humanize(values.lightingStyle)}` : "",
+          humanize(values.shadowStyle) ? `shadow control: ${humanize(values.shadowStyle)}` : "",
+          humanize(values.renderOutput) ? `render output: ${humanize(values.renderOutput)}` : ""
+        ]),
+        "The repeat must be truly seamless and tileable with clean edges, no visible seam lines, strong motif balance, crisp clarity, professional surface pattern design quality, POD-friendly composition, and commercial print readiness",
+        values.customNotes ? `Custom notes: ${values.customNotes}` : ""
+      ].filter(Boolean).join(". ") + ".";
+
+      return prompt.replace(/\.\s+\./g, ".").replace(/\s{2,}/g, " ");
+    }
+
+    function buildVideoPrompt(values){
+      const suggestedBg = buildBackgroundSuggestion(values);
+      const characterInstruction = values.faceType !== "None" || values.poseStyle !== "None" || values.stylingDirection !== "None"
+        ? "If the pattern includes character motifs, each repeated character should have a distinct face, pose, and styling variation while still matching the same overall visual system and aesthetic direction"
+        : "";
+
+      const prompt = [
+        "Create a short cinematic AI video prompt for a seamless pattern reveal designed for POD presentation, product marketing, or social media promotion",
+        joinParts([
+          humanize(values.patternTheme) ? `theme: ${humanize(values.patternTheme)}` : "",
+          humanize(values.mainMotif) ? `main motif: ${humanize(values.mainMotif)}` : "",
+          humanize(values.secondaryFillers) ? `fillers: ${humanize(values.secondaryFillers)}` : "",
+          humanize(values.artStyle) ? `art style: ${humanize(values.artStyle)}` : "",
+          humanize(values.colorPalette) ? `color palette: ${humanize(values.colorPalette)}` : "",
+          `background environment: ${suggestedBg}`,
+          humanize(values.layout) ? `layout logic: ${humanize(values.layout)}` : "",
+          humanize(values.repeatType) ? `repeat behavior: ${humanize(values.repeatType)}` : "",
+          humanize(values.scale) ? `scale: ${humanize(values.scale)}` : "",
+          humanize(values.density) ? `density: ${humanize(values.density)}` : "",
+          humanize(values.detailLevel) ? `detail level: ${humanize(values.detailLevel)}` : "",
+          humanize(values.mood) ? `mood: ${humanize(values.mood)}` : "",
+          humanize(values.productUse) ? `product application: ${humanize(values.productUse)}` : "",
+          humanize(values.surfaceFinish) ? `surface finish: ${humanize(values.surfaceFinish)}` : "",
+          humanize(values.extraPromptEnhancers) ? `prompt enhancer: ${humanize(values.extraPromptEnhancers)}` : ""
+        ]),
+        characterInstruction,
+        joinParts([
+          humanize(values.faceType) ? `character face style: ${humanize(values.faceType)}` : "",
+          humanize(values.poseStyle) ? `character pose energy: ${humanize(values.poseStyle)}` : "",
+          humanize(values.stylingDirection) ? `character styling direction: ${humanize(values.stylingDirection)}` : ""
+        ]),
+        joinParts([
+          humanize(values.cameraAngle) ? `camera angle: ${humanize(values.cameraAngle)}` : "",
+          humanize(values.cameraShot) ? `camera shot: ${humanize(values.cameraShot)}` : "",
+          humanize(values.lensStyle) ? `lens style: ${humanize(values.lensStyle)}` : "",
+          humanize(values.lightingStyle) ? `lighting style: ${humanize(values.lightingStyle)}` : "",
+          humanize(values.shadowStyle) ? `shadow treatment: ${humanize(values.shadowStyle)}` : "",
+          humanize(values.renderOutput) ? `final visual mode: ${humanize(values.renderOutput)}` : ""
+        ]),
+        "Video sequence direction: begin with an elegant reveal of the pattern surface, show the motifs flowing into a clean seamless repeat, add subtle motion that emphasizes repeat logic and print quality, transition into a product or presentation view suitable for POD marketing, and end on a polished hero frame with loop-friendly continuity",
+        "Motion details: gentle parallax, refined camera drift, subtle motif shimmer or movement where appropriate, visually clean transitions, no broken seams, no warped repeat logic, no muddy details",
+        values.customNotes ? `Custom notes: ${values.customNotes}` : ""
+      ].filter(Boolean).join(". ") + ".";
+
+      return prompt.replace(/\.\s+\./g, ".").replace(/\s{2,}/g, " ");
+    }
+
+    function generatePrompts(){
+      const values = getFormValues();
+      const photo = buildPhotoPrompt(values);
+      const video = buildVideoPrompt(values);
+      document.getElementById("photoOutput").textContent = photo;
+      document.getElementById("videoOutput").textContent = video;
+    }
+
+    function copyText(text){
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied.");
+      }).catch(() => {
+        alert("Copy failed. Your browser is being rude.");
+      });
+    }
+
+    function renderPresets(){
+      const box = document.getElementById("presetGrid");
+      box.innerHTML = "";
+      presets.forEach((preset, index) => {
+        const btn = document.createElement("button");
+        btn.className = "preset-btn";
+        btn.innerHTML = `<strong>${index + 1}. ${preset.name}</strong><small>${preset.note}</small>`;
+        btn.addEventListener("click", () => setFormValues(preset.values));
+        box.appendChild(btn);
+      });
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generatePrompts);
+    document.getElementById("generateTop").addEventListener("click", generatePrompts);
+
+    document.getElementById("randomizeBtn").addEventListener("click", randomizeAll);
+    document.getElementById("randomizeTop").addEventListener("click", randomizeAll);
+
+    document.getElementById("clearBtn").addEventListener("click", clearAll);
+    document.getElementById("clearTop").addEventListener("click", clearAll);
+
+    document.getElementById("copyPhotoBtn").addEventListener("click", () => {
+      copyText(document.getElementById("photoOutput").textContent);
+    });
+
+    document.getElementById("copyVideoBtn").addEventListener("click", () => {
+      copyText(document.getElementById("videoOutput").textContent);
+    });
+
+    document.getElementById("copyBothBtn").addEventListener("click", () => {
+      const photo = document.getElementById("photoOutput").textContent;
+      const video = document.getElementById("videoOutput").textContent;
+      copyText("PHOTO PROMPT:\n\n" + photo + "\n\nVIDEO SCRIPT PROMPT:\n\n" + video);
+    });
+
+    Object.keys(fields).forEach(id => {
+      document.getElementById(id).addEventListener("change", generatePrompts);
+    });
+    document.getElementById("customNotes").addEventListener("input", generatePrompts);
+
+    renderPresets();
+    generatePrompts();
+  </script>
+</body>
+</html>
